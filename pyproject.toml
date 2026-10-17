@@ -1,0 +1,49 @@
+[project]
+name = "guardrail-eval-pipeline"
+version = "0.2.0"
+description = "A guardrail, observability and evaluation layer that wraps any RAG or agentic chatbot."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.141.1",
+    "httpx>=0.28.1",
+    "langsmith>=0.14.4,<0.15",
+    "pydantic>=2.10.6",
+    "boto3>=1.43,<2",
+    "python-dotenv>=1.2.3",
+    "pyyaml>=6.0.3",
+    "uvicorn>=0.53.0,<0.54.0",
+]
+
+# The evaluation stack. Installed with the package rather than as a dev extra: the
+# evaluation runner is part of what this pipeline is, not a tool for building it.
+#
+# Pinned exactly where the project publishes often enough that a range would pick up a
+# build inside the seven-day cooldown; a version suffices otherwise.
+[project.optional-dependencies]
+evaluation = [
+    "ragas==0.4.3",
+    "langchain-groq==1.1.3",
+    "langchain-aws==1.7.9",   # 1.8.0 was a day old
+    # The RAGAS evaluator when OPENAI_API_KEY is set; Groq is the fallback. Declared rather
+    # than relied on transitively, because a resolution that dropped it would break scoring
+    # only at run time. 1.6.7 is four days old, inside the cooldown.
+    "langchain-openai==1.6.6",
+    # ragas 0.4.3 (the current release) still imports
+    # langchain_community.chat_models.vertexai, which 0.4.x moved. Held on the line that
+    # has it; without this, importing ragas at all raises ModuleNotFoundError.
+    "langchain-community<0.4",
+]
+
+[dependency-groups]
+dev = ["pytest>=9.1.1"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/guardrail_eval_pipeline"]
