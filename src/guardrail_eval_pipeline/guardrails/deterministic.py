@@ -74,7 +74,7 @@ def bad_citations(
 
     for raw_index in CITATION_INDEX.findall(answer):
         index = int(raw_index)
-        if index < 1 or index >= len(contexts):
+        if index < 1 or index > len(contexts):
             problems.append(f"citation-out-of-range:{index}")
 
     return tuple(sorted(set(problems)))
