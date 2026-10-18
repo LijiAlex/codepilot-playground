@@ -100,6 +100,42 @@ uv run python examples/inline_guardrail.py
 
 ---
 
+### Using it as a library
+
+The example above is the whole integration, and you can call it from your own code
+([`examples/inline_guardrail.py`](examples/inline_guardrail.py)):
+
+```python
+from guardrail_eval_pipeline.config import load_policy
+from guardrail_eval_pipeline.guardrails import BedrockGuardrail
+
+guardrail = BedrockGuardrail.from_policy(load_policy("guardrails/medibot.yaml"))
+
+verdict = guardrail.check_input(question)
+if verdict.blocked:
+    return verdict.message
+```
+
+`check_input` returns a `Verdict`:
+
+- `blocked` is the decision.
+- `reasons` names the policies that fired. It is for your logs only; never show it to the
+  caller, because it is a map of what the filters look for.
+- `message` is the generic refusal that may be shown. It is the refusal Bedrock returns,
+  or the policy's `blocked_input_message` if Bedrock gave none.
+
+`BedrockGuardrail.from_policy` finds the deployed guardrail **by name**, in the policy's
+`region`, using boto3 (so it needs AWS credentials). It raises `LookupError` if no guardrail
+with that name exists there; apply it first with `python scripts/guardrail.py apply
+guardrails/medibot.yaml`. `load_policy` raises `ConfigError` if the file is missing or lacks
+`name`, `region`, `blocked_input_message` or `blocked_output_message`.
+
+The same object checks answers before you return them. `check_output` takes a
+`TargetResponse` (the answer and the passages it was built from), the `question`, and
+optionally `allowed_scopes`, and returns a `Verdict` the same way.
+
+---
+
 ## Quick start
 
 You will recieve a guardrail id after the first apply.
