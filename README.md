@@ -102,7 +102,7 @@ uv run python examples/inline_guardrail.py
 
 ## Quick start
 
-You will recieve a guardrail id after the first apply.
+You will receive a guardrail id after the first apply.
 
 Requires Python 3.12 and [uv](https://docs.astral.sh/uv/).
 
