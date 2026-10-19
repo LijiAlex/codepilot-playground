@@ -262,6 +262,17 @@ def test_a_wrong_citation_is_recorded_but_does_not_block():
     assert "uncited-source:invented.pdf" in verdict.reasons
 
 
+def test_citations_are_one_based_so_the_last_passage_is_in_range():
+    """【3】 with three passages is valid; 【4】 is past the end and 【0】 is before the start."""
+    from guardrail_eval_pipeline.contracts import Retrieved
+    from guardrail_eval_pipeline.guardrails import deterministic
+
+    contexts = [Retrieved(text=f"passage {n}", label="a.pdf") for n in (1, 2, 3)]
+    assert not deterministic.bad_citations("As described 【3】.", [], contexts)
+    assert "citation-out-of-range:4" in deterministic.bad_citations("See 【4】.", [], contexts)
+    assert "citation-out-of-range:0" in deterministic.bad_citations("See 【0】.", [], contexts)
+
+
 def test_the_output_check_fails_closed_too():
     verdict = guard(TimeoutError("read timeout")).check_output(answered(), question="q")
     assert verdict.blocked is True
