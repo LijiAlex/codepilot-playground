@@ -41,6 +41,16 @@ def status(checks, name) -> str:
 
 
 # --- the deterministic checks -------------------------------------------------
+def test_check_passed_is_true_only_for_pass():
+    """n/a is neither passed nor failed."""
+    ok = heuristics.Check("c", heuristics.PASS)
+    bad = heuristics.Check("c", heuristics.FAIL)
+    na = heuristics.Check("c", heuristics.NOT_APPLICABLE)
+    assert (ok.passed, ok.failed) == (True, False)
+    assert (bad.passed, bad.failed) == (False, True)
+    assert (na.passed, na.failed) == (False, False)
+
+
 def test_a_good_answer_passes_everything_applicable():
     checks = heuristics.run(outcome())
     assert not [c for c in checks if c.failed]
