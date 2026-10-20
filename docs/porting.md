@@ -18,7 +18,7 @@ principals:
 system's answers into the shared shape:
 
 ```python
-from guardrail_eval_pipeline.contracts import Retrieved, TargetResponse
+from guardrail_eval_pipeline.contracts import Passage, TargetResponse
 
 
 class SchedulingTarget:
@@ -33,7 +33,7 @@ class SchedulingTarget:
         body = self._post(question, token)
         return TargetResponse(
             answer=body["reply"],                                  # it calls it "reply"
-            contexts=[Retrieved(text=s["text"], scope=s.get("zone"))
+            contexts=[Passage(text=s["text"], scope=s.get("zone"))
                       for s in body["snippets"]],
             citations=body.get("refs", []),
             refused=body.get("declined", False),

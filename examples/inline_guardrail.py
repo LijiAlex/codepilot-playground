@@ -17,11 +17,11 @@ This is the whole integration:
 from __future__ import annotations
 
 from guardrail_eval_pipeline.config import load_policy
-from guardrail_eval_pipeline.contracts import Retrieved, TargetResponse
+from guardrail_eval_pipeline.contracts import Passage, TargetResponse
 from guardrail_eval_pipeline.guardrails import BedrockGuardrail
 
 PASSAGES = [
-    Retrieved(
+    Passage(
         text="Meropenem: 1 g every 8 hours by slow IV injection. Formulary tier 3.",
         scope="clinical",
         label="drug_formulary.pdf / Antibiotics",

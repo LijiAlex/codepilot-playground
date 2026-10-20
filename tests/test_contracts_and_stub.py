@@ -2,7 +2,13 @@
 
 from __future__ import annotations
 
-from guardrail_eval_pipeline.contracts import Retrieved, Target, TargetResponse, implements_target
+from guardrail_eval_pipeline.contracts import (
+    Passage,
+    Retrieved,
+    Target,
+    TargetResponse,
+    implements_target,
+)
 from guardrail_eval_pipeline.adapters.stub import StubTarget, sample_answer
 
 
@@ -18,9 +24,15 @@ def test_a_bare_answer_reports_no_contexts():
 def test_contexts_carry_the_passage_not_just_a_filename():
     """Grounding and three of the four RAGAS metrics score against the text itself."""
     response = sample_answer()
-    assert isinstance(response.contexts[0], Retrieved)
+    assert isinstance(response.contexts[0], Passage)
     assert "1 g Q8H" in response.contexts[0].text
     assert response.contexts[0].score == 6.38
+
+
+def test_retrieved_is_a_backward_compatible_alias_for_passage():
+    """Code written against the old name keeps working."""
+    assert Retrieved is Passage
+    assert isinstance(Retrieved(text="x"), Passage)
 
 
 def test_stub_satisfies_the_target_protocol():

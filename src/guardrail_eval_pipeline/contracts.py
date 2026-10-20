@@ -37,7 +37,7 @@ class TargetAuthError(TargetError):
 
 
 @dataclass
-class Retrieved:
+class Passage:
     """One passage the target retrieved on its way to an answer.
 
     Only `text` is required. `score` and `label` are whatever the target exposes — a
@@ -53,6 +53,11 @@ class Retrieved:
     scope: str | None = None
 
 
+# Backward compatibility: `Passage` was called `Retrieved` before. Outside code that still
+# imports the old name keeps working.
+Retrieved = Passage
+
+
 @dataclass
 class TargetResponse:
     """One answer from the target, normalised.
@@ -63,7 +68,7 @@ class TargetResponse:
     """
 
     answer: str
-    contexts: list[Retrieved] = field(default_factory=list)
+    contexts: list[Passage] = field(default_factory=list)
     citations: list[str] = field(default_factory=list)
     refused: bool = False
     refusal_reason: str | None = None
