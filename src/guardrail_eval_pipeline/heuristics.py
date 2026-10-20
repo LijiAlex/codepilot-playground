@@ -30,7 +30,17 @@ PASS, FAIL, NOT_APPLICABLE = "pass", "fail", "n/a"
 # Bracketed reference markers are pointers, not claims, so a number inside one is not a
 # fact the answer is asserting.
 REFERENCE_MARKER = re.compile(r"【[^】]*】|\[\d+\]")
-NUMBER = re.compile(r"\d+(?:\.\d+)?")
+NUMBER = re.compile(r"\d+(?:,\d{3})*(?:\.\d+)?")
+
+
+def _stands_alone_in(number: str, material: str) -> bool:
+    """The whole number appears in the material, not inside a longer one.
+
+    "5" is not supported by "15", "2025", "5.5" or "1,500", but is by "5 mg", "5,", "5." at
+    the end of a sentence and "(5)".
+    """
+    pattern = rf"(?<!\d)(?<!\d[.,]){re.escape(number)}(?!\d)(?![.,]\d)"
+    return re.search(pattern, material) is not None
 
 
 @dataclass(frozen=True)
@@ -134,7 +144,7 @@ def numeric_claims_are_supported(outcome: Outcome) -> Check:
         return Check("numeric_claims_are_supported", NOT_APPLICABLE, "no passages to check")
     answer = REFERENCE_MARKER.sub("", fold(outcome.response.answer))
     material = fold(" ".join(c.text for c in outcome.response.contexts))
-    unsupported = sorted({n for n in NUMBER.findall(answer) if n not in material})
+    unsupported = sorted({n for n in NUMBER.findall(answer) if not _stands_alone_in(n, material)})
     if unsupported:
         return Check("numeric_claims_are_supported", FAIL,
                      f"not in any passage: {unsupported[:6]}")
