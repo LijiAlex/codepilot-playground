@@ -17,7 +17,7 @@ import os
 import httpx
 
 from guardrail_eval_pipeline.config import TargetConfig
-from guardrail_eval_pipeline.contracts import Retrieved, TargetAuthError, TargetError, TargetResponse
+from guardrail_eval_pipeline.contracts import Passage, TargetAuthError, TargetError, TargetResponse
 
 # The keys `render` copies. An allowlist, so a field added to MediBot later does not
 # start reaching browsers through here.
@@ -203,7 +203,7 @@ class MediBotTarget:
         envelope = body.get("eval") or {}
 
         contexts = [
-            Retrieved(
+            Passage(
                 text=item.get("text", ""),
                 score=item.get("score"),
                 label=" / ".join(

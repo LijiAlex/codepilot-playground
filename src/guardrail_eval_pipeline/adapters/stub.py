@@ -9,7 +9,7 @@ shape under another name.
 
 from __future__ import annotations
 
-from guardrail_eval_pipeline.contracts import Retrieved, TargetResponse
+from guardrail_eval_pipeline.contracts import Passage, TargetResponse
 
 
 class StubTarget:
@@ -68,7 +68,7 @@ def sample_answer(
     return TargetResponse(
         answer=answer,
         contexts=[
-            Retrieved(
+            Passage(
                 text=context,
                 score=6.38,
                 label="drug_formulary.pdf / Antimicrobials",

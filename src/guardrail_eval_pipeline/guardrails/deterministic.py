@@ -15,12 +15,12 @@ from __future__ import annotations
 
 import re
 
-from guardrail_eval_pipeline.contracts import Retrieved
+from guardrail_eval_pipeline.contracts import Passage
 
 CITATION_INDEX = re.compile(r"【(\d+)")
 
 
-def scope_leak(contexts: list[Retrieved], allowed: list[str] | None) -> tuple[str, ...] | None:
+def scope_leak(contexts: list[Passage], allowed: list[str] | None) -> tuple[str, ...] | None:
     """Passages used from an access zone this caller may not read.
 
     `allowed` comes from the target, which publishes what each principal may see. None
@@ -35,7 +35,7 @@ def scope_leak(contexts: list[Retrieved], allowed: list[str] | None) -> tuple[st
 
 
 def uncontained_identifiers(
-    answer: str, contexts: list[Retrieved], patterns: dict[str, str]
+    answer: str, contexts: list[Passage], patterns: dict[str, str]
 ) -> tuple[str, ...] | None:
     """Identifiers in the answer that appear in none of the passages behind it.
 
@@ -58,7 +58,7 @@ def uncontained_identifiers(
 
 
 def bad_citations(
-    answer: str, citations: list[str], contexts: list[Retrieved]
+    answer: str, citations: list[str], contexts: list[Passage]
 ) -> tuple[str, ...] | None:
     """Citations that point at nothing that was retrieved.
 

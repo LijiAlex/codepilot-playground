@@ -169,9 +169,9 @@ def test_without_a_guardrail_the_question_goes_straight_through():
 # --- the output layer ---------------------------------------------------------
 from dataclasses import replace  # noqa: E402
 
-from guardrail_eval_pipeline.contracts import Retrieved, TargetResponse  # noqa: E402
+from guardrail_eval_pipeline.contracts import Passage, TargetResponse  # noqa: E402
 
-CLINICAL = Retrieved(text="Meropenem 1 g every 8 hours. Formulary tier 3.",
+CLINICAL = Passage(text="Meropenem 1 g every 8 hours. Formulary tier 3.",
                      scope="clinical", label="drug_formulary.pdf / Antibiotics")
 
 MASKED = {
@@ -264,10 +264,10 @@ def test_a_wrong_citation_is_recorded_but_does_not_block():
 
 def test_citations_are_one_based_so_the_last_passage_is_in_range():
     """【3】 with three passages is valid; 【4】 is past the end and 【0】 is before the start."""
-    from guardrail_eval_pipeline.contracts import Retrieved
+    from guardrail_eval_pipeline.contracts import Passage
     from guardrail_eval_pipeline.guardrails import deterministic
 
-    contexts = [Retrieved(text=f"passage {n}", label="a.pdf") for n in (1, 2, 3)]
+    contexts = [Passage(text=f"passage {n}", label="a.pdf") for n in (1, 2, 3)]
     assert not deterministic.bad_citations("As described 【3】.", [], contexts)
     assert "citation-out-of-range:4" in deterministic.bad_citations("See 【4】.", [], contexts)
     assert "citation-out-of-range:0" in deterministic.bad_citations("See 【0】.", [], contexts)
@@ -319,7 +319,7 @@ def test_a_target_refusal_keeps_its_own_message():
 # this caller just retrieved, because it never sees the corpus. These pin the rule that
 # decides when the pipeline may show one back, and the rule's two safe directions.
 
-BILLING = Retrieved(text="Bupa — TPA / Contact = In-house · 1800‑425‑2255.",
+BILLING = Passage(text="Bupa — TPA / Contact = In-house · 1800‑425‑2255.",
                     scope="billing", label="billing_codes.pdf / Insurer panel")
 
 PII_MASKED = {
@@ -384,7 +384,7 @@ def test_an_identifier_is_not_shown_even_from_the_callers_own_passage():
         "assessments": [{"sensitiveInformationPolicy": {"regexes": [
             {"match": "CLM-2024-1000", "name": "claim_id", "action": "ANONYMIZED"}]}}],
     }
-    passage = Retrieved(text="Claim CLM-2024-1000 was rejected.", scope="billing",
+    passage = Passage(text="Claim CLM-2024-1000 was rejected.", scope="billing",
                         label="claims")
     verdict = restoring_guard(masked).check_output(
         billing_answer(answer="Claim CLM-2024-1000 was rejected.", contexts=[passage]),

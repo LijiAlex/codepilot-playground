@@ -23,7 +23,7 @@ from typing import Any
 from guardrail_eval_pipeline import heuristics, judge as judging, ragas_metrics, service
 from guardrail_eval_pipeline.adapters import build_target
 from guardrail_eval_pipeline.config import TargetConfig, load_policy, load_target
-from guardrail_eval_pipeline.contracts import Retrieved, TargetError, TargetResponse
+from guardrail_eval_pipeline.contracts import Passage, TargetError, TargetResponse
 from guardrail_eval_pipeline.dataset import Case, Dataset, load as load_dataset
 from guardrail_eval_pipeline.guardrails import BedrockGuardrail
 
@@ -132,7 +132,7 @@ def _outcomes(dataset: Dataset, run: Run) -> list[heuristics.Outcome]:
             case=by_id[result.case_id],
             response=TargetResponse(
                 answer=result.answer,
-                contexts=[Retrieved(text=t) for t in result.contexts],
+                contexts=[Passage(text=t) for t in result.contexts],
                 citations=list(result.citations),
                 refused=result.observed == "target_refused",
             ),
@@ -201,7 +201,7 @@ def add_judge(dataset: Dataset, run: Run, *, pace_s: float = 0.0) -> None:
             case=Case(id=probe.id, question=probe.question, principal="n/a",
                       expect="answered", expected_answer="(probe)"),
             response=TargetResponse(answer=probe.answer,
-                                    contexts=[Retrieved(text=c) for c in probe.contexts],
+                                    contexts=[Passage(text=c) for c in probe.contexts],
                                     citations=[]),
             blocked=False, reasons=(), elapsed_ms=0.0)
         probe_checks = [asdict(c) for c in heuristics.run(probe_outcome)]

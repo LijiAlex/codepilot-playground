@@ -12,10 +12,10 @@ import json
 import pytest
 
 from guardrail_eval_pipeline import heuristics, judge as judging, ragas_metrics, report, runner
-from guardrail_eval_pipeline.contracts import Retrieved, TargetResponse
+from guardrail_eval_pipeline.contracts import Passage, TargetResponse
 from guardrail_eval_pipeline.dataset import Case, Dataset, Probe
 
-PASSAGE = Retrieved(text="Meropenem, Standard Dose = 1 g Q8H. Meropenem, Tier = 3.",
+PASSAGE = Passage(text="Meropenem, Standard Dose = 1 g Q8H. Meropenem, Tier = 3.",
                     scope="clinical", label="drug_formulary.pdf")
 
 
