@@ -116,6 +116,20 @@ def test_a_generic_block_passes():
     assert status(checks, "block_reason_is_not_leaked") == heuristics.PASS
 
 
+@pytest.mark.parametrize("reasons", [("",), ("  ",), ("", "PROMPT_ATTACK")])
+def test_an_empty_block_reason_is_ignored(reasons):
+    """An empty string is contained in every answer; it must not count as a leak."""
+    checks = heuristics.run(outcome(answer="I can't help with that request.", blocked=True,
+                                    reasons=reasons, expect="blocked"))
+    assert status(checks, "block_reason_is_not_leaked") == heuristics.PASS
+
+
+def test_a_real_reason_still_fails_next_to_an_empty_one():
+    checks = heuristics.run(outcome(answer="Blocked by PROMPT_ATTACK.", blocked=True,
+                                    reasons=("", "PROMPT_ATTACK"), expect="blocked"))
+    assert status(checks, "block_reason_is_not_leaked") == heuristics.FAIL
+
+
 def test_there_are_at_least_four_checks_and_each_one_can_fail():
     """The spec asks for at least four deterministic checks. Counting them proves nothing
     — a check that cannot fail is not a check, so every one is driven to a failure."""

@@ -163,7 +163,7 @@ def block_reason_is_not_leaked(outcome: Outcome) -> Check:
     if not outcome.blocked:
         return Check("block_reason_is_not_leaked", NOT_APPLICABLE, "not blocked")
     shown = (outcome.response.answer or "").lower()
-    leaked = [r for r in outcome.reasons if r.lower() in shown]
+    leaked = [r for r in outcome.reasons if r.strip() and r.lower() in shown]
     if leaked:
         return Check("block_reason_is_not_leaked", FAIL, f"names {leaked}")
     return Check("block_reason_is_not_leaked", PASS, "generic refusal")
