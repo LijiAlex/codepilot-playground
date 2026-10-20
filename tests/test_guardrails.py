@@ -289,6 +289,17 @@ def test_scope_is_unavailable_rather_than_passed_when_the_target_will_not_say():
     assert deterministic.bad_citations("x", ["a.pdf"], []) is None
 
 
+def test_an_uncontained_identifier_is_reported_once_and_in_sorted_order():
+    from guardrail_eval_pipeline.guardrails import deterministic
+    patterns = {"claim": r"CLM-\d+"}
+    passages = [CLINICAL]
+    assert deterministic.uncontained_identifiers(
+        "CLM-1 was paid; later CLM-1 was reopened.", passages, patterns) == ("claim:CLM-1",)
+    assert deterministic.uncontained_identifiers(
+        "CLM-9, CLM-2, CLM-9 and CLM-1", passages, patterns
+    ) == ("claim:CLM-1", "claim:CLM-2", "claim:CLM-9")
+
+
 def test_a_target_refusal_keeps_its_own_message():
     """State B: the target declined on its own terms, and its wording is specific and
     correct. Replacing it with the generic refusal tells the user less than the target

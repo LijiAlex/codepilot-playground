@@ -48,13 +48,13 @@ def uncontained_identifiers(
     if not contexts:
         return None
     material = "\n".join(c.text for c in contexts)
-    found: list[str] = []
+    found: set[str] = set()
     for name, pattern in patterns.items():
         for match in re.findall(pattern, answer):
             value = match if isinstance(match, str) else match[0]
             if value and value not in material:
-                found.append(f"{name}:{value}")
-    return tuple(found)
+                found.add(f"{name}:{value}")
+    return tuple(sorted(found))
 
 
 def bad_citations(
