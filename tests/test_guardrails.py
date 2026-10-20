@@ -203,7 +203,7 @@ def test_citation_markers_are_stripped_before_the_answer_is_graded():
     guardrail = guard(ALLOWED)
     guardrail.check_output(answered(answer="Dose is 1 g【1†L1-L3】."), question="q")
     graded = guardrail.client.calls[-1]["content"][-1]["text"]["text"]
-    assert graded == "Dose is 1 g."
+    assert graded == "dose is 1 g."
 
 
 def test_an_answer_that_should_have_passages_but_has_none_is_blocked():
