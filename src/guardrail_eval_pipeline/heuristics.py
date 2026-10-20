@@ -35,7 +35,10 @@ NUMBER = re.compile(r"\d+(?:\.\d+)?")
 
 @dataclass(frozen=True)
 class Check:
-    """One deterministic verdict about one case."""
+    """One deterministic verdict about one case.
+
+    The status is pass, fail or n/a; n/a is neither `passed` nor `failed`.
+    """
 
     name: str
     status: str
@@ -44,6 +47,14 @@ class Check:
     @property
     def failed(self) -> bool:
         return self.status == FAIL
+
+    @property
+    def passed(self) -> bool:
+        """True only when the check passed.
+
+        n/a is neither passed nor failed, so `passed` and `failed` can both be False.
+        """
+        return self.status == PASS
 
 
 @dataclass(frozen=True)
