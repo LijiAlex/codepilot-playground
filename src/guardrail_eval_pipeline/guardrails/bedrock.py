@@ -25,14 +25,14 @@ CITATION_MARKER = re.compile(r"【[^】]*】")
 
 
 def normalise(text: str) -> str:
-    """Strip citation markers, then fold unicode punctuation.
+    """Strip citation markers, fold unicode punctuation, and lower-case the text.
 
     Grounding scores the answer's wording, so the target's `【1†L1-L3】` markers depress a
     correct answer badly. NFKC does not affect grounding, and is applied for the
     deterministic checks, which compare strings exactly and would miss an identifier
     written with a narrow no-break space. See the README for the measurements.
     """
-    return unicodedata.normalize("NFKC", CITATION_MARKER.sub("", text))
+    return unicodedata.normalize("NFKC", CITATION_MARKER.sub("", text)).lower()
 
 # Where a blocked or masked entry can appear in an assessment.
 _ASSESSMENT_PATHS = (
@@ -163,7 +163,7 @@ class BedrockGuardrail:
         # rather than contributing to a score.
         leaked = deterministic.scope_leak(response.contexts, allowed_scopes)
         uncontained = deterministic.uncontained_identifiers(
-            answer, response.contexts, self.identifier_patterns)
+            response.answer, response.contexts, self.identifier_patterns)
         # Reported, never blocking: a miscounted marker is a correctness problem, not a
         # leak. The judge grades citation correctness; this records it.
         # The RAW answer: normalising strips the markers this check reads.
@@ -179,7 +179,7 @@ class BedrockGuardrail:
             verdict = replace(verdict, reasons=verdict.reasons + noted)
 
         if verdict.masked_text is not None and response.contexts and self.restorable:
-            verdict = self._restore(verdict, answer, response.contexts)
+            verdict = self._restore(verdict, response.answer, response.contexts)
 
         if verdict.masked_text is not None and not response.contexts:
             # Masking withheld. The reasons stay, so the log records what was found.
