@@ -29,7 +29,7 @@ PASS, FAIL, NOT_APPLICABLE = "pass", "fail", "n/a"
 
 # Bracketed reference markers are pointers, not claims, so a number inside one is not a
 # fact the answer is asserting.
-REFERENCE_MARKER = re.compile(r"【[^】]*】|\[\d+\]")
+REFERENCE_MARKER = re.compile(r"【[^】]*】|\[\s*\d+(?:\s*[,-]\s*\d+)*\s*\]")
 NUMBER = re.compile(r"\d+(?:,\d{3})*(?:\.\d+)?")
 
 

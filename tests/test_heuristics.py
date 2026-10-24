@@ -37,6 +37,23 @@ def test_a_standalone_number_supports_it(passage):
     assert numeric_status("Give 5 mg", passage) == heuristics.PASS
 
 
+@pytest.mark.parametrize("answer", [
+    "Take 2 g [1, 3] daily [2-4].",
+    "Take 2 g [1,2,5] daily.",
+    "Take 2 g [7 - 9] daily.",
+    "Take 2 g [2] daily.",
+    "Take 2 g 【6, 8】 daily.",
+])
+def test_multi_passage_reference_markers_are_not_claims(answer):
+    assert numeric_status(answer, "Take 2 g") == heuristics.PASS
+
+
+@pytest.mark.parametrize("answer", ["Take [see 3 g] daily", "Take [3 g] daily",
+                                    "Take [1, 3 g] daily"])
+def test_a_bracket_with_other_text_is_not_a_marker(answer):
+    assert numeric_status(answer, "Take 2 g") == heuristics.FAIL
+
+
 def test_decimals_and_grouped_numbers_in_the_answer_still_work():
     assert numeric_status("Give 5.5 mg", "Dose 5.5 mg") == heuristics.PASS
     assert numeric_status("Give 5.5 mg", "Dose 15.5 mg") == heuristics.FAIL
