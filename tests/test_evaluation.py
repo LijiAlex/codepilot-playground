@@ -61,6 +61,21 @@ def test_an_uncited_document_answer_fails():
     assert status(heuristics.run(outcome(citations=())), "cites_a_source") == heuristics.FAIL
 
 
+@pytest.mark.parametrize("citations", [[""], ["  "], ["", " \t"], [None], ["", None, "\n"]])
+def test_blank_citation_names_do_not_count_as_a_citation(citations):
+    check = next(c for c in heuristics.run(outcome(citations=citations))
+                 if c.name == "cites_a_source")
+    assert check.status == heuristics.FAIL
+    assert check.detail == "an answer from documents cited none"
+
+
+def test_only_real_citations_are_counted():
+    check = next(c for c in heuristics.run(outcome(citations=["", "doc.pdf", "  ", None]))
+                 if c.name == "cites_a_source")
+    assert check.status == heuristics.PASS
+    assert check.detail == "1 cited"
+
+
 def test_a_refusal_is_not_expected_to_cite_anything():
     """Not applicable, not a pass. A refusal has no document to cite and failing it would
     punish correct behaviour."""

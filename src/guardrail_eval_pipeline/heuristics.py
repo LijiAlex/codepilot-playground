@@ -104,8 +104,9 @@ def cites_a_source(outcome: Outcome) -> Check:
     """
     if outcome.observed != "answered" or not outcome.case.grounded:
         return Check("cites_a_source", NOT_APPLICABLE, outcome.observed)
-    if outcome.response.citations:
-        return Check("cites_a_source", PASS, f"{len(outcome.response.citations)} cited")
+    cited = [c for c in outcome.response.citations or () if c and c.strip()]
+    if cited:
+        return Check("cites_a_source", PASS, f"{len(cited)} cited")
     return Check("cites_a_source", FAIL, "an answer from documents cited none")
 
 
